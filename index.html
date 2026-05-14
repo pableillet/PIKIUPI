@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FFD700">
+<title>PIKIUPI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { overscroll-behavior: none; height: 100%; width: 100%; }
+  html { background: linear-gradient(180deg, #FFD700 0%, #FFC300 100%); transition: background 0.3s; }
+  html.dark { background: linear-gradient(180deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%); }
+  body { font-family: 'Nunito', sans-serif; min-height: 100vh; min-height: 100dvh; background: transparent; }
+  #root { min-height: 100vh; min-height: 100dvh; width: 100%; display: flex; flex-direction: column; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes groupPulse {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes titlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  input::placeholder, textarea::placeholder { color: #999; }
+  input:focus, textarea:focus { outline: none; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #6B1FE8; border-radius: 4px; }
+  button { font-family: inherit; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// =========================================================
+// LOGO (SVG, transparent, color changes with theme)
+// =========================================================
+function Logo({ color, size = 280 }) {
+  return (
+    <svg
+      viewBox="20 220 750 350"
+      width={size}
+      height={size * 350 / 750}
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: "block" }}
+    >
+      <g transform="translate(0.000000,800.000000) scale(0.100000,-0.100000)" fill={color}>
+        <path d="M1420 5654 c-305 -42 -547 -145 -731 -309 -147 -132 -277 -357 -319 -555 -6 -30 -16 -71 -21 -91 -22 -87 6 -328 47 -406 7 -16 14 -31 14 -36 0 -16 46 -105 88 -172 30 -47 114 -139 256 -280 116 -115 226 -232 244 -259 80 -118 128 -248 165 -441 70 -367 240 -600 493 -675 59 -18 197 -8 264 18 141 55 240 211 240 375 0 87 -29 191 -82 295 -50 98 -109 175 -260 335 -188 198 -223 279 -173 392 27 59 100 116 285 220 369 209 584 442 656 713 18 69 18 253 0 312 -66 214 -195 358 -416 463 -198 93 -506 135 -750 101z m250 -715 c59 -13 125 -59 154 -108 26 -45 25 -139 -3 -203 -79 -184 -313 -358 -483 -358 -77 0 -117 25 -149 92 -21 45 -24 66 -24 157 0 92 4 116 29 179 73 189 265 286 476 241z" />
+        <path d="M7267 5327 c-75 -26 -132 -73 -175 -146 -21 -35 -27 -61 -30 -128 -4 -78 -2 -88 27 -148 113 -230 419 -232 541 -3 30 56 34 72 34 138 0 64 -4 83 -29 130 -41 74 -95 125 -163 151 -83 31 -127 32 -205 6z m73 -85 c30 -24 19 -58 -24 -76 -46 -19 -86 -71 -86 -111 0 -44 -29 -80 -58 -71 -29 10 -37 47 -23 111 14 62 57 116 116 145 50 24 48 24 75 2z" />
+        <path d="M4700 5331 c-100 -21 -162 -89 -190 -209 -14 -59 -12 -88 20 -272 12 -69 23 -136 25 -150 28 -207 39 -321 55 -548 23 -339 26 -370 60 -517 21 -94 23 -101 33 -125 4 -8 14 -35 22 -60 23 -66 101 -185 143 -218 126 -99 293 -124 445 -65 63 24 169 97 215 148 156 168 269 473 294 792 12 155 2 318 -27 416 -40 139 -134 227 -242 227 -94 0 -170 -57 -194 -143 -11 -41 -8 -194 6 -247 14 -55 17 -268 6 -336 -17 -95 -54 -167 -102 -193 -99 -56 -175 29 -186 206 -3 55 1 129 11 198 8 61 22 162 31 225 12 85 16 164 12 300 -4 174 -6 190 -34 271 -65 186 -172 289 -313 302 -30 3 -71 2 -90 -2z" />
+        <path d="M4015 5266 c-140 -44 -239 -146 -326 -332 -65 -140 -76 -167 -84 -194 -12 -43 -101 -214 -140 -271 -81 -118 -156 -173 -201 -149 -43 23 -41 76 6 235 50 166 63 289 39 364 -34 107 -42 122 -95 170 -61 56 -95 67 -180 58 -143 -15 -278 -175 -330 -392 -32 -134 -32 -444 0 -770 19 -194 96 -553 157 -724 83 -236 176 -341 302 -341 109 0 186 79 202 208 7 52 0 90 -38 234 -28 102 -26 138 11 181 50 58 150 -38 166 -160 4 -27 9 -64 11 -83 15 -124 39 -186 92 -229 127 -105 320 -34 380 141 35 101 23 201 -39 323 -38 75 -71 118 -176 228 -94 99 -124 155 -124 229 1 112 87 213 324 383 172 124 321 275 375 381 93 179 76 336 -47 447 -79 71 -186 94 -285 63z" />
+        <path d="M6310 5171 c-196 -37 -349 -171 -390 -342 -14 -56 -8 -269 10 -389 19 -122 23 -289 10 -384 -32 -243 -70 -367 -206 -676 -34 -79 -37 -92 -38 -185 -1 -104 0 -109 61 -201 33 -52 142 -115 245 -144 88 -24 123 -25 195 -4 69 20 120 64 152 134 25 54 25 59 26 300 0 239 1 246 24 295 42 85 95 149 214 254 158 140 237 239 313 391 143 287 112 581 -81 775 -79 80 -138 116 -245 151 -82 27 -216 38 -290 25z m279 -505 c93 -49 88 -216 -11 -359 -66 -95 -185 -190 -250 -199 -31 -4 -41 49 -35 197 6 128 26 203 75 277 53 81 153 119 221 84z" />
+        <path d="M7255 4571 c-23 -10 -59 -39 -81 -64 -64 -73 -92 -137 -134 -317 -12 -52 -26 -104 -31 -115 -4 -11 -16 -49 -25 -85 -9 -36 -20 -69 -24 -75 -4 -5 -15 -32 -24 -58 -38 -102 -155 -289 -283 -452 -30 -38 -70 -102 -89 -142 -29 -62 -34 -82 -34 -147 0 -62 4 -83 26 -123 36 -65 57 -86 123 -126 77 -46 141 -62 242 -61 72 0 95 4 140 27 128 62 217 208 274 447 7 28 35 185 39 215 13 102 57 261 111 400 15 39 38 102 50 140 12 39 25 77 28 85 16 35 25 187 15 240 -33 180 -180 276 -323 211z" />
+        <path d="M4210 4381 c-117 -19 -218 -138 -242 -286 -18 -107 16 -301 77 -440 59 -134 85 -257 85 -405 0 -184 26 -247 122 -296 89 -45 236 -23 322 48 20 16 48 53 63 81 22 45 25 60 20 126 -5 81 -15 115 -82 286 -65 163 -73 212 -78 445 -5 229 -15 279 -70 352 -53 70 -132 102 -217 89z" />
+        <path d="M2307 4135 c-95 -19 -153 -50 -214 -113 -43 -44 -57 -68 -73 -122 -11 -37 -20 -78 -20 -91 1 -58 53 -207 127 -364 88 -185 119 -276 137 -400 14 -98 21 -125 41 -170 45 -102 104 -140 215 -140 138 1 240 73 274 196 14 53 15 70 5 113 -23 99 -43 152 -106 281 -34 72 -68 153 -74 180 -6 28 -14 145 -18 260 -6 201 -7 212 -32 260 -29 55 -72 90 -131 106 -22 5 -45 12 -51 14 -7 2 -43 -3 -80 -10z" />
+      </g>
+    </svg>
+  );
+}
+
+// =========================================================
+// DEFAULT CONTENT
+// =========================================================
+const DEFAULT_NEVER = {
+  casual: ["Yo nunca he enviado un mensaje al grupo equivocado","Yo nunca he fingido que no vi un mensaje para no responder","Yo nunca he cantado en la ducha a pleno pulmón","Yo nunca me he quedado dormido en el transporte público","Yo nunca he stalkeado a alguien en redes más de 30 minutos","Yo nunca he mentido sobre mi edad","Yo nunca he comido algo del suelo (regla de los 5 segundos)","Yo nunca me he hecho el enfermo para no ir a trabajar o clase","Yo nunca he llorado con una película","Yo nunca he olvidado el cumpleaños de alguien importante","Yo nunca he hecho una videollamada sin pantalones","Yo nunca he fingido saber de algo sin tener ni idea","Yo nunca me he caído en público de forma vergonzosa","Yo nunca he llorado por algo súper tonto","Yo nunca he echado la culpa a otro por algo que hice yo","Yo nunca me he ido sin pagar de un sitio (aunque sea por error)","Yo nunca he hablado mal de alguien justo antes de que apareciera","Yo nunca he olvidado el nombre de alguien que acababa de conocer","Yo nunca me he reído en un funeral o velatorio","Yo nunca he fingido un ataque de risa para disimular","Yo nunca he cantado el himno de mi equipo en plena calle","Yo nunca me he quedado dormido en clase o en una reunión","Yo nunca he saludado a alguien que no me saludaba a mí","Yo nunca he tropezado con una farola","Yo nunca he confundido a un desconocido con un amigo","Yo nunca he tenido que devolver algo en una tienda mintiendo","Yo nunca he revisado el móvil de mi pareja a escondidas","Yo nunca he hablado solo en voz alta y alguien me ha pillado","Yo nunca he soñado con un compañero de trabajo","Yo nunca he comido pizza con piña","Yo nunca me he echado un pedo en público y disimulado","Yo nunca he visto un capítulo de mi serie favorita sin la persona con la que la veo","Yo nunca he mentido sobre cuánto bebí la noche anterior","Yo nunca me he hecho una foto fingiendo que me la hacían en secreto"],
+  picante: ["Yo nunca he besado a alguien que acababa de conocer","Yo nunca he ligado por Instagram","Yo nunca he enviado un mensaje subido de tono","Yo nunca me he liado con alguien de este grupo","Yo nunca he tenido un crush con alguien de este grupo","Yo nunca he hecho sexting","Yo nunca me he despertado sin recordar el nombre de quien tenía al lado","Yo nunca he tenido una cita de Tinder","Yo nunca he mandado nudes","Yo nunca me he arrepentido de un beso","Yo nunca he besado a alguien del mismo sexo","Yo nunca he tenido un rollo con el/la ex de un amigo/a","Yo nunca he flirteado con alguien para conseguir algo","Yo nunca he tenido fantasías con un profesor o jefe","Yo nunca me he liado con dos personas en la misma semana","Yo nunca he mentido sobre mi número de personas","Yo nunca he tenido un encuentro con mi crush en sueños","Yo nunca he besado a alguien estando con otra persona","Yo nunca he mentido en una primera cita","Yo nunca he tenido un rollo de oficina","Yo nunca me he reído en un momento íntimo","Yo nunca he ido sin ropa interior a un evento","Yo nunca me he hecho el dormido para evitar a alguien al despertar","Yo nunca he tenido una historia con alguien que conocí en una fiesta","Yo nunca he flirteado por WhatsApp en horas de trabajo","Yo nunca he tenido un crush con un amigo/a de un familiar","Yo nunca he buscado al ex en redes después de mucho tiempo","Yo nunca he tenido un sueño picante con alguien que no debería","Yo nunca he respondido un mensaje subido de tono en el baño del trabajo","Yo nunca he tenido una cita con dos personas distintas en el mismo día","Yo nunca le he dicho 'te quiero' sin sentirlo","Yo nunca he ligado con alguien estando borracho/a y luego ni me acordaba"],
+  extremo: ["Yo nunca he sido pillado en una situación comprometida","Yo nunca lo he hecho en un sitio público","Yo nunca me he liado con dos personas en la misma noche","Yo nunca he tenido un rollo de una noche","Yo nunca he fantaseado con alguien de este grupo","Yo nunca he hecho un trío","Yo nunca me he grabado en un momento íntimo","Yo nunca he mentido sobre el número de personas con las que he estado","Yo nunca he tenido relaciones con alguien casado/a","Yo nunca he engañado a una pareja","Yo nunca he ido a un club de intercambio","Yo nunca he tenido un rollo con el mejor amigo de mi pareja","Yo nunca he tenido sexo con el ex después de cortar","Yo nunca he hecho un striptease para alguien","Yo nunca me he liado con alguien mucho mayor o mucho menor que yo","Yo nunca he tenido un encuentro con un desconocido","Yo nunca he tenido fantasías con alguien de mi familia política","Yo nunca he hecho cosas en un coche aparcado en un sitio dudoso","Yo nunca he pagado o cobrado por algo de naturaleza íntima","Yo nunca he visto a mis padres en una situación incómoda","Yo nunca he tenido un rollo en el baño de un sitio público","Yo nunca le he sido infiel mentalmente a alguien con quien estaba","Yo nunca he hecho un sex tape voluntariamente","Yo nunca he tenido fantasías con alguien del mismo sexo siendo hetero (o viceversa)","Yo nunca he tenido un encuentro romántico en la playa","Yo nunca he probado un juguete erótico","Yo nunca he tenido un rollo con alguien y su pareja sin que se enterase","Yo nunca he chantajeado emocionalmente a alguien para que volviera conmigo","Yo nunca he echado a alguien de mi casa al terminar","Yo nunca he fingido conocer a alguien para librarme de otro","Yo nunca he hecho cosas que ni yo me reconocería contando","Yo nunca he tenido un rollo con alguien sin recordar al día siguiente nada"],
+};
+
+const DEFAULT_TOD = {
+  casual: {
+    verdad: ["¿Cuál es la cosa más vergonzosa que has hecho borracho/a?","¿Quién de aquí crees que sería el peor compañero de piso?","¿Cuál es tu peor manía?","¿Qué es lo más raro que has buscado en Google?","¿Cuál ha sido tu peor cita?","¿De qué te arrepientes más?","¿Cuál es tu secreto más tonto?","¿Qué es lo más infantil que sigues haciendo?","¿Cuál es la mayor mentira que le has dicho a tus padres?","¿Qué cosa fea has dicho de alguien que está aquí?","¿Qué es lo peor que has hecho en el trabajo o la universidad?","¿Cuál es tu placer culpable más vergonzoso?","¿Cuándo fue la última vez que mentiste y a quién?","¿Cuál es tu mayor inseguridad?","¿Qué cosa harías si supieras que nadie se entera?","¿Cuál es tu peor recuerdo de la infancia?","¿De quién has hablado mal hoy?","¿Cuál es la cosa más rara que has comido?","¿Has copiado en un examen alguna vez?","¿Qué crees que la gente piensa de ti que no es cierto?","¿Cuál ha sido tu mayor fail en redes sociales?","¿Qué fue lo último por lo que lloraste?","¿Qué canción nunca admitirías que escuchas?","¿Cuál ha sido tu peor compra impulsiva?","¿Qué famoso te cae fatal sin razón aparente?"],
+    reto: ["{X} tiene que imitar a {Y} durante 1 minuto","{X} tiene que llamar al último contacto de su móvil y decir 'te quiero'","{X} tiene que bailar sin música durante 30 segundos","{X} tiene que hacer 10 flexiones","{X} tiene que hablar con acento francés el resto de la ronda","{X} tiene que dejar que {Y} le publique algo en Instagram","{X} tiene que hacer de camarero/a y servir bebidas a todos","{X} tiene que enseñar la última foto de su galería","{X} tiene que mostrar la última conversación de WhatsApp","{X} tiene que cantar el estribillo de su canción favorita","{X} tiene que poner una cara graciosa y mantenerla durante 30s","{X} tiene que hacer una voz aguda durante 2 turnos","{X} tiene que recitar el alfabeto al revés","{X} tiene que dar un cumplido sincero a cada persona","{X} tiene que dejar que {Y} le elija el siguiente trago","{X} y {Y} tienen que intercambiarse una prenda durante 3 turnos","{X} tiene que hacer una llamada en altavoz a uno de sus padres","{X} tiene que enseñar su búsqueda más reciente en Google","{X} tiene que bailar la macarena","{X} tiene que decir un trabalenguas tres veces seguidas","{X} tiene que enseñar su última story","{X} tiene que imitar a un famoso hasta que alguien acierte","{X} tiene que beber sin usar las manos","{X} tiene que enseñar la foto más antigua que tenga en el móvil","{X} tiene que hacer una pose ridícula durante 30 segundos"]
+  },
+  picante: {
+    verdad: ["¿Quién de aquí te parece más atractivo/a?","¿Con quién de aquí te irías a una isla desierta?","¿Cuál es tu mayor fantasía?","¿Qué es lo más atrevido que has hecho en una cita?","¿Has tenido algún sueño subido de tono con alguien de aquí?","¿Cuál ha sido tu peor experiencia romántica?","¿Alguna vez has fingido en la cama?","¿Cuál ha sido tu beso más memorable?","¿Dónde fue el sitio más raro donde te han besado?","¿Cuál es el rasgo físico que más te atrae?","¿Te has enamorado de un amigo/a?","¿Cuál es la edad mínima con la que saldrías?","¿Crees en el amor a primera vista?","¿Quién fue tu primer crush serio?","¿Te has arrepentido alguna vez de dejar a una pareja?","¿Has espiado el móvil de tu pareja?","¿Cuál es el mayor red flag que ignoraste por gusto?","¿Cuántas personas has besado en tu vida?","¿Cuál ha sido tu mensaje subido de tono más atrevido?","¿Te liarías con dos personas a la vez con permiso?","¿Qué parte del cuerpo es la que más te gusta de ti?","¿Has flirteado con alguien del trabajo o la universidad?","¿Cuál ha sido tu peor cita?","¿Has buscado a tu ex en redes esta semana?","¿Cuál es la cosa más cursi que has hecho por alguien?"],
+    reto: ["{X} tiene que darle un masaje de 30 segundos a {Y}","{X} tiene que sentarse en las piernas de {Y} durante 2 turnos","{X} tiene que susurrarle algo al oído a {Y}","{X} tiene que hacer un baile sensual durante 20 segundos","{X} tiene que dejar que {Y} le mande un mensaje desde su móvil","{X} tiene que mirar a los ojos a {Y} durante 30 segundos sin reírse","{X} tiene que darle un beso en la mejilla a {Y}","{X} tiene que decir su mayor fantasía en voz alta","{X} y {Y} tienen que tumbarse y hablarse al oído durante 30s","{X} tiene que enseñar su último mensaje de ligue","{X} tiene que cantarle una canción romántica a {Y}","{X} tiene que escribir un cumplido subido de tono para {Y}","{X} tiene que beber del vaso de {Y}","{X} tiene que coger a {Y} en brazos durante 10 segundos","{X} tiene que decirle a {Y} qué le gustaría hacer con él/ella","{X} tiene que dejar que {Y} le quite los zapatos","{X} tiene que hacer una pose sexy para una foto","{X} tiene que confesar a quién del grupo se follaría","{X} tiene que enseñar la conversación más subida de tono que tenga","{X} tiene que beber un chupito del cuerpo de {Y}"]
+  },
+  extremo: {
+    verdad: ["¿Con quién de aquí tendrías un rollo?","¿Qué es lo más salvaje que has hecho en tu vida?","¿Cuál es tu kink secreto?","¿Has tenido fantasías con alguien prohibido?","¿Qué harías si tuvieras que liarte con alguien de aquí ahora mismo?","Describe tu noche más loca con detalle","¿Cuántas personas hay en tu lista?","¿Has hecho un trío o lo harías?","¿Con quién del grupo tendrías sexo si no hubiera consecuencias?","¿Cuál es el sitio más arriesgado donde lo has hecho?","¿Has tenido relaciones con alguien estando con tu pareja?","¿Tienes algún fetiche que nadie sepa?","¿Cuál es el mayor secreto sexual que guardas?","¿Te has acostado con alguien por venganza?","¿Has tenido sexo con alguien que acababas de conocer ese día?","¿Has tenido relaciones con un amigo/a y luego seguir como si nada?","¿Qué es lo más raro que has hecho durante el sexo?","¿Te has acostado con alguien para conseguir algo a cambio?","¿Cuál es tu mayor arrepentimiento sexual?","¿Has tenido una relación que tendrías que ocultar?","Ranking de los 3 mejores y peores con los que has estado"],
+    reto: ["{X} tiene que darle un beso a {Y}","{X} tiene que hacer un body shot a {Y}","{X} tiene que liarse con {Y} durante 10 segundos","{X} tiene que quitarse una prenda","{X} tiene que dejar que {Y} le haga un chupetón","{X} tiene que hacer un striptease de 15 segundos","{X} tiene que sentarse en el regazo de {Y} sin ropa interior visible durante 1 minuto","{X} tiene que darle un beso francés a {Y} de 5 segundos","{X} tiene que comerle el cuello a {Y} durante 10 segundos","{X} tiene que dejar que {Y} le pinte algo en una zona del cuerpo a elección","{X} y {Y} tienen que intercambiarse una prenda íntima","{X} tiene que enseñar la foto más arriesgada que tenga en el móvil","{X} tiene que confesar el último rollo que tuvo con detalle","{X} tiene que dejar que {Y} elija lo que tiene que hacer durante 1 minuto","{X} tiene que decirle a {Y} qué le haría si pudiera ahora mismo","{X} tiene que beber un chupito del ombligo de {Y}","{X} tiene que dejar que {Y} le susurre algo y reaccionar como si fuera la cosa más excitante del mundo","{X} y {Y} tienen que bailar un perreo durante 20 segundos"]
+  },
+};
+
+const DEFAULT_UNCOMF = {
+  casual: ["¿Quién de aquí crees que miente más?","¿A quién de aquí eliminarías de tu vida sin pensarlo?","¿Quién de aquí crees que es el/la más falso/a?","Si solo pudieras salvar a uno de aquí, ¿a quién elegirías?","¿Quién aquí tiene el ego más grande?","¿Quién es el/la más pesado/a del grupo?","¿Quién es el/la más vago/a del grupo?","¿Quién es el/la peor amigo/a del grupo?","¿De quién te alejarías si pudieras?","¿Quién es el/la más egoísta?","¿Quién es el/la más dramático/a?","¿Quién aquí crees que habla mal a tus espaldas?","¿Quién es el/la más interesado/a?","¿Quién te ha decepcionado más?","¿Quién es el/la que peor escucha?","¿Quién es el/la que más exagera todo?","¿Quién aquí crees que es más infeliz?","¿Quién es el/la que peor cae a tu familia?"],
+  picante: ["¿A quién de aquí le mandarías un mensaje a las 3am?","¿Con quién aquí tendrías una cita secreta?","¿A quién de aquí no besarías ni por 1000 euros?","¿Quién de aquí crees que besa mejor?","¿Quién de aquí crees que es el/la más atractivo/a?","¿Con quién de aquí te casarías?","¿Quién crees que tiene más experiencia?","¿A quién no presentarías a tu familia jamás?","¿Con quién de aquí te emborracharías para ver qué pasa?","¿Quién crees que es el/la más fácil?","¿Quién es el/la mejor partido del grupo?","¿A quién le verías como rollo pero no como pareja?","¿Con quién de aquí harías sexting?","¿Quién crees que tiene más fantasías?","¿A quién has soñado en plan picante?"],
+  extremo: ["¿Con quién aquí harías un trío?","¿A quién de aquí te tirarías sin dudarlo?","¿Quién de aquí crees que lo haría mejor en la cama?","Señala a la persona con la que follarías esta noche","Si tuvieras que acostarte con alguien de aquí, ¿quién y por qué?","¿Quién crees que es el/la más infiel del grupo?","¿A quién le pegarías un cuerno con quién?","¿Con quién aquí tendrías la noche más salvaje?","¿Quién crees que tiene los kinks más raros?","Si pudieras saber un secreto de cada uno, ¿a quién preguntarías primero?","¿Con quién de aquí grabarías un vídeo íntimo?","¿Quién crees que ha tenido más rollos?","¿A quién crees que le falta sexo en su vida?","Ordena al grupo de mejor a peor en la cama según tu intuición","¿Quién crees que finge en la cama?"],
+};
+
+const DEFAULT_MG = [
+  {
+    id: "moneda",
+    name: "Juego de la Moneda",
+    description: "Un jugador hace una pregunta en privado a otro. La respuesta es alguien del grupo. Se lanza la moneda: Cara = se revela, Cruz = secreto.",
+    hasAssignedPlayer: true,
+    chanceElement: "coin",
+    type: "builtin_moneda",
+    caraProbability: 0.55
+  },
+  {
+    id: "medusa",
+    name: "Medusa",
+    description: "Todos agachan la cabeza. A la de 3, la levantan y miran a alguien. Los que se miran mutuamente... beben.",
+    hasAssignedPlayer: false,
+    chanceElement: null,
+    type: "builtin_medusa"
+  },
+  {
+    id: "botella",
+    name: "La Botella",
+    description: "Gira la botella. La persona a la que apunte tendrá que cumplir lo que te toque.",
+    hasAssignedPlayer: true,
+    chanceElement: "bottle",
+    type: "builtin_botella",
+    actions: [
+      "darle un beso en los labios",
+      "comerle el cuello durante 10 segundos",
+      "darle un beso en la mejilla",
+      "darle un beso francés de 5 segundos",
+      "morderle la oreja",
+      "susurrarle algo sucio al oído"
+    ]
+  }
+];
+
+// =========================================================
+// UTILS
+// =========================================================
+const shuffle = (a) => { const b = [...a]; for (let i = b.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [b[i],b[j]] = [b[j],b[i]]; } return b; };
+const pick = (a) => a[Math.floor(Math.random()*a.length)];
+const otherP = (ps, ex) => { const o = ps.filter((_,i)=>i!==ex); return o.length ? o[Math.floor(Math.random()*o.length)] : null; };
+
+// =========================================================
+// THEME
+// =========================================================
+const themes = {
+  light: {
+    bg: "linear-gradient(180deg, #FFD700 0%, #FFC300 100%)",
+    cardBg: "rgba(107, 31, 232, 0.08)",
+    cardBorder: "rgba(107, 31, 232, 0.25)",
+    text: "#1a1a2e",
+    textMuted: "#5a4e3a",
+    accent: "#6B1FE8",
+    accentSoft: "rgba(107, 31, 232, 0.15)",
+    yellow: "#FFD700",
+    inputBg: "rgba(255, 255, 255, 0.6)",
+    inputBorder: "rgba(107, 31, 232, 0.4)",
+    logoColor: "#6B1FE8",
+    rouletteColor: "#4A0FA0",
+  },
+  dark: {
+    bg: "linear-gradient(180deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%)",
+    cardBg: "rgba(107, 31, 232, 0.15)",
+    cardBorder: "rgba(107, 31, 232, 0.3)",
+    text: "#ffffff",
+    textMuted: "#b8b8d0",
+    accent: "#6B1FE8",
+    accentSoft: "rgba(107, 31, 232, 0.3)",
+    yellow: "#FFD700",
+    inputBg: "rgba(255, 255, 255, 0.05)",
+    inputBorder: "rgba(107, 31, 232, 0.4)",
+    logoColor: "#FFD700",
+    rouletteColor: "#FFD700",
+  }
+};
+
+// =========================================================
+// COIN FLIP COMPONENT
+// =========================================================
+function CoinFlip({ onResult, t, caraProbability = 0.55 }) {
+  const [flipping, setFlipping] = useState(false);
+  const [result, setResult] = useState(null);
+  const [rot, setRot] = useState(0);
+  const flip = () => {
+    if (flipping || result) return;
+    setFlipping(true);
+    setResult(null);
+    const cara = Math.random() < caraProbability;
+    // We need rotation to end on the right face.
+    // CARA = front (rotation 0, 360, 720...)  -> end on multiple of 360
+    // CRUZ = back  (rotation 180, 540...)     -> end on 180 + multiple of 360
+    // Use enough spins for a satisfying flip.
+    setRot(prev => {
+      // Add a random extra full spins to make it feel different each time
+      const extraSpins = 5 + Math.floor(Math.random() * 3); // 5-7 extra full spins
+      const baseRotation = extraSpins * 360;
+      return baseRotation + (cara ? 0 : 180);
+    });
+    setTimeout(() => {
+      setFlipping(false);
+      setResult(cara ? "cara" : "cruz");
+      onResult(cara);
+    }, 2000);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
+      {/* Coin container with perspective */}
+      <div style={{ perspective: 1000, width: 140, height: 140, cursor: flipping || result ? "default" : "pointer" }} onClick={flip}>
+        <div style={{
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          transformStyle: "preserve-3d",
+          transition: flipping ? "transform 2s cubic-bezier(0.34, 0.05, 0.18, 1)" : (result ? "transform .3s" : "none"),
+          transform: `rotateY(${rot}deg)`,
+        }}>
+          {/* CARA — front face (rotation 0) */}
+          <div style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            WebkitBackfaceVisibility: "hidden",
+            backfaceVisibility: "hidden",
+            background: "radial-gradient(circle at 30% 28%, #FFF4B8 0%, #FFD700 35%, #E6A800 80%, #B88800 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 36,
+            fontWeight: 900,
+            color: "#6B1FE8",
+            border: "4px solid #6B1FE8",
+            letterSpacing: 1,
+            boxShadow: "inset 0 -10px 25px rgba(184,136,0,0.5), inset 0 10px 25px rgba(255,255,255,0.4), 0 8px 20px rgba(0,0,0,0.3)",
+          }}>
+            <span style={{ textShadow: "0 2px 4px rgba(74,15,160,0.3)" }}>CARA</span>
+          </div>
+          {/* CRUZ — back face (rotation 180) */}
+          <div style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            WebkitBackfaceVisibility: "hidden",
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+            background: "radial-gradient(circle at 30% 28%, #A969FF 0%, #6B1FE8 40%, #4A0FA0 85%, #2A0670 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 36,
+            fontWeight: 900,
+            color: "#FFD700",
+            border: "4px solid #FFD700",
+            letterSpacing: 1,
+            boxShadow: "inset 0 -10px 25px rgba(42,6,112,0.6), inset 0 10px 25px rgba(255,255,255,0.2), 0 8px 20px rgba(0,0,0,0.3)",
+          }}>
+            <span style={{ textShadow: "0 2px 4px rgba(0,0,0,0.4)" }}>CRUZ</span>
+          </div>
+        </div>
+      </div>
+
+      {!flipping && !result && <p style={{ color: t.accent, fontSize: 16, fontWeight: 700, animation: "pulse 1.5s infinite" }}>Toca para lanzar</p>}
+      {result && (
+        <div style={{
+          padding: "16px 30px",
+          borderRadius: 16,
+          background: result === "cara" ? "linear-gradient(135deg,#FFD700,#FFA500)" : "linear-gradient(135deg,#6B1FE8,#4A0FA0)",
+          color: result === "cara" ? "#1a1a2e" : "#FFD700",
+          fontSize: 22,
+          fontWeight: 900,
+          textTransform: "uppercase",
+          animation: "bounceIn .5s",
+          boxShadow: result === "cara" ? "0 6px 30px rgba(255,215,0,0.6)" : "0 6px 30px rgba(107,31,232,0.6)",
+          letterSpacing: 1,
+        }}>
+          {result === "cara" ? "¡Ea, a contarlo!" : "Secretito 💋"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =========================================================
+// BOTTLE SPIN COMPONENT
+// =========================================================
+function BottleSpin({ players, currentPlayerIdx, compatibleIdxs, onResult, t }) {
+  const [spinning, setSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const [target, setTarget] = useState(null);
+
+  const radius = 110;
+  const numPlayers = players.length;
+  const anglePerPlayer = 360 / numPlayers;
+
+  const spin = () => {
+    if (spinning || target !== null) return;
+    setSpinning(true);
+    // Prefer compatible players. Fall back to anyone other than current.
+    let candidates;
+    if (compatibleIdxs && compatibleIdxs.length > 0) {
+      candidates = compatibleIdxs.filter(i => i !== currentPlayerIdx);
+      if (candidates.length === 0) candidates = players.map((_, i) => i).filter(i => i !== currentPlayerIdx);
+    } else {
+      candidates = players.map((_, i) => i).filter(i => i !== currentPlayerIdx);
+    }
+    const tgtIdx = candidates[Math.floor(Math.random() * candidates.length)];
+    const fullSpins = 5 * 360;
+    const finalAngle = fullSpins + (tgtIdx * anglePerPlayer);
+    setRotation(finalAngle);
+    setTimeout(() => {
+      setTarget(tgtIdx);
+      setSpinning(false);
+      onResult(tgtIdx);
+    }, 3500);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, width: "100%" }}>
+      {/* Circle with players */}
+      <div style={{ position: "relative", width: 280, height: 280 }}>
+        {/* Player names around the circle */}
+        {players.map((p, i) => {
+          const angle = (i * anglePerPlayer - 90) * Math.PI / 180;
+          const x = 140 + radius * Math.cos(angle);
+          const y = 140 + radius * Math.sin(angle);
+          const isCurrent = i === currentPlayerIdx;
+          const isTarget = target === i;
+          return (
+            <div key={i} style={{
+              position: "absolute",
+              left: x,
+              top: y,
+              transform: "translate(-50%, -50%)",
+              padding: "6px 10px",
+              borderRadius: 12,
+              background: isTarget ? "linear-gradient(135deg,#FFD700,#FFA500)" : (isCurrent ? "linear-gradient(135deg,#6B1FE8,#5A18C9)" : t.cardBg),
+              color: isTarget ? "#1a1a2e" : (isCurrent ? "#FFD700" : t.text),
+              fontSize: 12,
+              fontWeight: 800,
+              border: `2px solid ${isTarget ? "#FFD700" : (isCurrent ? "#6B1FE8" : t.cardBorder)}`,
+              whiteSpace: "nowrap",
+              maxWidth: 100,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              boxShadow: isTarget ? "0 0 20px rgba(255,215,0,0.6)" : "none",
+              transition: "all .3s",
+            }}>{p.name}</div>
+          );
+        })}
+        {/* Center bottle */}
+        <div style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: 140,
+          height: 140,
+          transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+          transition: spinning ? "transform 3.5s cubic-bezier(0.17, 0.67, 0.21, 0.99)" : "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.35))",
+        }}>
+          {/* Realistic bottle SVG */}
+          <svg width="140" height="140" viewBox="0 0 100 140">
+            <defs>
+              <linearGradient id="bottleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3A0A80" />
+                <stop offset="35%" stopColor="#7B30F0" />
+                <stop offset="55%" stopColor="#8E47FF" />
+                <stop offset="75%" stopColor="#5A18C9" />
+                <stop offset="100%" stopColor="#3A0A80" />
+              </linearGradient>
+              <linearGradient id="capGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#B89000" />
+                <stop offset="50%" stopColor="#FFD700" />
+                <stop offset="100%" stopColor="#B89000" />
+              </linearGradient>
+              <linearGradient id="liquidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#FFD700" stopOpacity="0.0" />
+                <stop offset="40%" stopColor="#FFD700" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#FFA500" stopOpacity="0.4" />
+              </linearGradient>
+            </defs>
+
+            {/* Bottle main shape — drawn as a single path with curves (neck + shoulder + body + bottom) */}
+            <path
+              d="M 44 8
+                 L 44 28
+                 C 44 32, 40 34, 38 38
+                 C 34 44, 30 50, 30 60
+                 L 30 118
+                 C 30 125, 33 128, 40 128
+                 L 60 128
+                 C 67 128, 70 125, 70 118
+                 L 70 60
+                 C 70 50, 66 44, 62 38
+                 C 60 34, 56 32, 56 28
+                 L 56 8
+                 Z"
+              fill="url(#bottleGrad)"
+            />
+
+            {/* Liquid inside (subtle) */}
+            <path
+              d="M 32 80
+                 L 32 118
+                 C 32 124, 34 126, 40 126
+                 L 60 126
+                 C 66 126, 68 124, 68 118
+                 L 68 80
+                 Z"
+              fill="url(#liquidGrad)"
+            />
+
+            {/* Highlight (vertical shine on the left) */}
+            <path
+              d="M 36 38
+                 C 34 44, 33 50, 33 60
+                 L 33 110"
+              stroke="rgba(255,255,255,0.45)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+            />
+
+            {/* Small highlight on neck */}
+            <line
+              x1="46" y1="12" x2="46" y2="26"
+              stroke="rgba(255,255,255,0.5)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+
+            {/* Cap */}
+            <rect x="42" y="2" width="16" height="10" rx="2" fill="url(#capGrad)" />
+            <line x1="42" y1="6" x2="58" y2="6" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
+
+            {/* Pointer tip indicator (above the cap) */}
+            <polygon points="50,0 44,8 56,8" fill="#FFD700" stroke="#B89000" strokeWidth="0.5" />
+          </svg>
+        </div>
+      </div>
+
+      {!spinning && target === null && (
+        <button onClick={spin} style={{
+          padding: "16px 32px",
+          borderRadius: 16,
+          border: "none",
+          background: "linear-gradient(135deg,#6B1FE8,#5A18C9)",
+          color: "#FFD700",
+          fontSize: 18,
+          fontWeight: 800,
+          cursor: "pointer",
+          boxShadow: "0 4px 20px rgba(107,31,232,.4)",
+          fontFamily: "'Nunito', sans-serif",
+        }}>GIRAR BOTELLA</button>
+      )}
+      {spinning && <p style={{ color: t.textMuted, fontSize: 14, fontWeight: 700, animation: "pulse .5s infinite" }}>Girando...</p>}
+      {target !== null && (
+        <div style={{
+          padding: "16px 28px",
+          borderRadius: 16,
+          background: "linear-gradient(135deg,#FFD700,#FFC300)",
+          color: "#1a1a2e",
+          fontSize: 18,
+          fontWeight: 900,
+          textAlign: "center",
+          animation: "bounceIn .5s",
+          maxWidth: 320,
+        }}>
+          ¡Apuntó a {players[target].name}!
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =========================================================
+// ROULETTE ANIMATION
+// =========================================================
+function RouletteAnim({ players, targetIdx, onDone, t }) {
+  const [idx, setIdx] = useState(0);
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    const start = Date.now();
+    let current = 0;
+    let timeoutId;
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      if (elapsed > 2500) {
+        setIdx(targetIdx);
+        setDone(true);
+        setTimeout(onDone, 900);
+        return;
+      }
+      const speed = 60 + Math.pow(elapsed / 2500, 2) * 300;
+      current = (current + 1) % players.length;
+      setIdx(current);
+      timeoutId = setTimeout(tick, speed);
+    };
+    timeoutId = setTimeout(tick, 60);
+    return () => clearTimeout(timeoutId);
+  }, []);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: 24, padding: "0 24px" }}>
+      <p style={{ fontSize: 14, color: t.textMuted, textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Turno de...</p>
+      <h1 style={{
+        fontSize: done ? 60 : 50,
+        fontWeight: 900,
+        color: t.rouletteColor,
+        textShadow: done ? (t.rouletteColor === "#FFD700" ? "0 0 40px rgba(255,215,0,0.6)" : "0 2px 20px rgba(74,15,160,0.4)") : "none",
+        transition: "all .3s",
+        textAlign: "center",
+        wordBreak: "break-word",
+        letterSpacing: "-1px",
+      }}>{players[idx].name}</h1>
+      {!done && <div style={{ width: 40, height: 4, borderRadius: 2, background: t.accent, animation: "pulse .3s infinite" }} />}
+    </div>
+  );
+}
+
+// =========================================================
+// GROUP EVENT SPLASH
+// =========================================================
+function GroupSplash({ title, onTap, t }) {
+  return (
+    <div
+      onClick={onTap}
+      style={{
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        position: "relative",
+        padding: "40px 24px",
+        animation: "fadeInUp .4s",
+      }}
+    >
+      <h2 style={{
+        fontSize: 32,
+        fontWeight: 900,
+        color: t.accent,
+        textTransform: "uppercase",
+        letterSpacing: 3,
+        marginBottom: 16,
+        textShadow: t.rouletteColor === "#FFD700"
+          ? "0 0 30px rgba(107,31,232,0.6)"
+          : "0 2px 10px rgba(107,31,232,0.25)",
+        textAlign: "center",
+      }}>Todos juegan</h2>
+      <h1 style={{
+        fontSize: 56,
+        fontWeight: 900,
+        color: t.rouletteColor,
+        textShadow: t.rouletteColor === "#FFD700"
+          ? "0 0 60px rgba(255,215,0,0.5)"
+          : "0 4px 20px rgba(74,15,160,0.35)",
+        textAlign: "center",
+        textTransform: "uppercase",
+        letterSpacing: 2,
+        padding: "0 16px",
+        wordBreak: "break-word",
+      }}>{title}</h1>
+      <p style={{ color: t.textMuted, fontSize: 14, marginTop: 40, animation: "pulse 1.5s infinite" }}>Toca la pantalla para continuar</p>
+    </div>
+  );
+}
+
+// =========================================================
+// ICONS
+// =========================================================
+const Icons = {
+  back: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>,
+  plus: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  edit: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  trash: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>,
+  close: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  check: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  moon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>,
+  sun: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
+  chevron: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+};
+
+// =========================================================
+// MAIN APP
+// =========================================================
+function Pikiupi() {
+  // ---- localStorage helpers ----
+  const loadLS = (key, fallback) => {
+    try {
+      const v = localStorage.getItem("pikiupi_" + key);
+      if (v === null) return fallback;
+      return JSON.parse(v);
+    } catch (e) { return fallback; }
+  };
+  const saveLS = (key, value) => {
+    try { localStorage.setItem("pikiupi_" + key, JSON.stringify(value)); } catch (e) {}
+  };
+
+  const [theme, setTheme] = useState(() => loadLS("theme", "light"));
+  const t = themes[theme];
+
+  // Sync html class with theme for full-width background
+  useEffect(() => {
+    if (theme === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+    saveLS("theme", theme);
+  }, [theme]);
+
+  const [screen, setScreen] = useState("home");
+  const [gameMode, setGameMode] = useState("pikiupi");
+
+  const [players, setPlayers] = useState([]); // Each player: {name, gender: "M"|"F"|"NB", attracted: ["M","F","NB"]}
+  const [pInput, setPInput] = useState("");
+  // Editing existing player gender/preferences (null = not editing, otherwise the index of the player)
+  const [editingPlayerIdx, setEditingPlayerIdx] = useState(null);
+  const [editGender, setEditGender] = useState(null);
+  const [editAttracted, setEditAttracted] = useState([]);
+  const [cats, setCats] = useState(["casual"]);
+  const [modes, setModes] = useState(["truthOrDare","neverHaveI","uncomfortableQuestions","minigames"]);
+
+  // Content state — load from localStorage with defaults as fallback
+  const [neverContent, setNeverContent] = useState(() => loadLS("neverContent", JSON.parse(JSON.stringify(DEFAULT_NEVER))));
+  const [todContent, setTodContent] = useState(() => loadLS("todContent", JSON.parse(JSON.stringify(DEFAULT_TOD))));
+  const [uncomfContent, setUncomfContent] = useState(() => loadLS("uncomfContent", JSON.parse(JSON.stringify(DEFAULT_UNCOMF))));
+  const [minigames, setMinigames] = useState(() => loadLS("minigames", JSON.parse(JSON.stringify(DEFAULT_MG))));
+
+  // Auto-save content changes to localStorage
+  useEffect(() => { saveLS("neverContent", neverContent); }, [neverContent]);
+  useEffect(() => { saveLS("todContent", todContent); }, [todContent]);
+  useEffect(() => { saveLS("uncomfContent", uncomfContent); }, [uncomfContent]);
+  useEffect(() => { saveLS("minigames", minigames); }, [minigames]);
+
+  const [events, setEvents] = useState([]);
+  const [eIdx, setEIdx] = useState(0);
+  const [round, setRound] = useState(1);
+  const [todChoice, setTodChoice] = useState(null);
+  const [coinResult, setCoinResult] = useState(null);
+  const [medCD, setMedCD] = useState(false);
+  const [medN, setMedN] = useState(3);
+  const [medDone, setMedDone] = useState(false);
+  const [bottleTarget, setBottleTarget] = useState(null);
+  const [bottleAction, setBottleAction] = useState(null);
+  const [phase, setPhase] = useState("content");
+
+  const [eMode, setEMode] = useState(null);
+  const [eCat, setECat] = useState("casual");
+  const [eSub, setESub] = useState("verdad");
+  const [newTxt, setNewTxt] = useState("");
+  const [editIdx, setEditIdx] = useState(null);
+  const [editTxt, setEditTxt] = useState("");
+  const [mgEditId, setMgEditId] = useState(null); // null = create new, otherwise editing existing
+  const [mgName, setMgName] = useState("");
+  const [mgDesc, setMgDesc] = useState("");
+  const [mgHasP, setMgHasP] = useState(true);
+  const [mgChance, setMgChance] = useState(null);
+  const [mgActions, setMgActions] = useState([]); // for bottle / custom
+  const [mgNewAction, setMgNewAction] = useState("");
+  const [mgCaraProb, setMgCaraProb] = useState(50); // For coin: probability of CARA in percent
+
+  const S = {
+    app: {
+      flex: 1,
+      background: "transparent",
+      color: t.text,
+      position: "relative",
+      maxWidth: 480,
+      margin: "0 auto",
+      width: "100%",
+      paddingTop: "env(safe-area-inset-top)",
+      paddingBottom: "env(safe-area-inset-bottom)",
+      display: "flex",
+      flexDirection: "column",
+    },
+    hdr: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", position: "relative", zIndex: 10 },
+    btn: { padding: "16px 24px", borderRadius: 16, border: "none", fontSize: 17, fontWeight: 800, cursor: "pointer", transition: "transform .15s, box-shadow .15s", fontFamily: "'Nunito',sans-serif", WebkitTapHighlightColor: "transparent" },
+    bP: { background: "linear-gradient(135deg,#6B1FE8,#5A18C9)", color: "#FFD700", boxShadow: "0 4px 20px rgba(107,31,232,.4)" },
+    bS: { background: "linear-gradient(135deg,#FFD700,#FFC300)", color: "#1a1a2e", boxShadow: "0 4px 20px rgba(255,215,0,.4)" },
+    bOutline: { background: "transparent", border: `2px solid ${t.accent}`, color: t.accent },
+    card: { background: t.cardBg, borderRadius: 20, padding: 20, border: `1px solid ${t.cardBorder}` },
+    inp: { width: "100%", padding: "14px 18px", borderRadius: 14, border: `2px solid ${t.inputBorder}`, background: t.inputBg, color: t.text, fontSize: 16, fontFamily: "'Nunito',sans-serif", outline: "none", boxSizing: "border-box", WebkitAppearance: "none" },
+    chip: (a) => ({ padding: "10px 20px", borderRadius: 25, border: a ? `2px solid ${t.accent}` : `2px solid ${t.cardBorder}`, background: a ? t.accentSoft : "transparent", color: a ? t.accent : t.textMuted, cursor: "pointer", fontSize: 14, fontWeight: 700, transition: "all .2s", fontFamily: "'Nunito',sans-serif" }),
+    tag: { display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 25, background: "linear-gradient(135deg,#6B1FE8,#5A18C9)", color: "#FFD700", fontSize: 14, fontWeight: 700 },
+    tagX: { background: "none", border: "none", color: "#FFD700", cursor: "pointer", fontSize: 18, padding: "0 0 0 4px", lineHeight: 1 },
+    sec: { padding: "0 20px", marginBottom: 24 },
+    lab: { fontSize: 13, fontWeight: 800, color: t.accent, textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 },
+    gc: { minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px", textAlign: "center" },
+    bk: { background: "none", border: "none", color: t.textMuted, cursor: "pointer", padding: 8, display: "flex", alignItems: "center", gap: 4 },
+    ib: { background: "none", border: "none", cursor: "pointer", color: t.textMuted, padding: 8, display: "flex", alignItems: "center", borderRadius: 10 },
+    themeBtn: { width: 44, height: 44, borderRadius: 22, background: t.accentSoft, border: `1px solid ${t.cardBorder}`, color: t.accent, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" },
+  };
+
+  // =========================================================
+  // GAME LOGIC
+  // =========================================================
+  const genEvents = useCallback(() => {
+    const events = [];
+    const order = shuffle(players.map((_, i) => i));
+
+    if (gameMode === "pikiupi") {
+      // Split minigames by whether they need an assigned player or not
+      const assignedMgs = minigames.filter(m => m.hasAssignedPlayer);
+      const groupMgs = minigames.filter(m => !m.hasAssignedPlayer);
+
+      // Build the pool of possible individual-turn event types
+      const individualOptions = [];
+      if (modes.includes("truthOrDare")) individualOptions.push("truthOrDare");
+      if (modes.includes("uncomfortableQuestions")) individualOptions.push("uncomf");
+      if (modes.includes("minigames") && assignedMgs.length > 0) individualOptions.push("mgAssigned");
+
+      // Generate one individual event per player (in shuffled order)
+      const individualEvents = order.map(pIdx => {
+        if (individualOptions.length === 0) return null;
+        const choice = pick(individualOptions);
+        const c = pick(cats);
+        if (choice === "truthOrDare") {
+          return { type: "truthOrDare", playerIdx: pIdx, category: c };
+        } else if (choice === "uncomf") {
+          const pool = uncomfContent[c] || [];
+          if (pool.length > 0) return { type: "uncomf", playerIdx: pIdx, question: pick(pool) };
+          return { type: "truthOrDare", playerIdx: pIdx, category: c };
+        } else if (choice === "mgAssigned") {
+          const mg = pick(assignedMgs);
+          return { type: "mg", mg, apIdx: pIdx };
+        }
+        return null;
+      }).filter(Boolean);
+
+      // Build the pool of possible group events
+      const groupPool = [];
+      if (modes.includes("neverHaveI")) groupPool.push("never");
+      if (modes.includes("minigames") && groupMgs.length > 0) groupPool.push("mgGroup");
+
+      // Decide how many group events: average 2 per round, randomized between 1 and 3
+      let numGroup = 0;
+      if (groupPool.length > 0) {
+        const r = Math.random();
+        if (r < 0.2) numGroup = 1;
+        else if (r < 0.8) numGroup = 2;
+        else numGroup = 3;
+      }
+
+      // Generate the group events
+      const groupEvents = [];
+      for (let i = 0; i < numGroup; i++) {
+        const choice = pick(groupPool);
+        if (choice === "never") {
+          const c = pick(cats);
+          const pool = neverContent[c] || [];
+          if (pool.length > 0) groupEvents.push({ type: "never", text: pick(pool) });
+        } else if (choice === "mgGroup") {
+          const mg = pick(groupMgs);
+          groupEvents.push({ type: "mg", mg, apIdx: null });
+        }
+      }
+
+      // Interleave: start with individual events, then insert group events at random positions
+      const result = [...individualEvents];
+      groupEvents.forEach(ge => {
+        // Insert at a random position (not at position 0 ideally, but anywhere valid)
+        const pos = Math.floor(Math.random() * (result.length + 1));
+        result.splice(pos, 0, ge);
+      });
+
+      events.push(...result);
+    } else if (gameMode === "truthOrDare") {
+      order.forEach((pIdx) => {
+        const c = pick(cats);
+        events.push({ type: "truthOrDare", playerIdx: pIdx, category: c });
+      });
+    } else if (gameMode === "neverHaveI") {
+      for (let i = 0; i < players.length * 2; i++) {
+        const c = pick(cats);
+        const pool = neverContent[c] || [];
+        if (pool.length > 0) events.push({ type: "never", text: pick(pool) });
+      }
+    } else if (gameMode === "uncomfortableQuestions") {
+      order.forEach((pIdx) => {
+        const c = pick(cats);
+        const pool = uncomfContent[c] || [];
+        if (pool.length > 0) events.push({ type: "uncomf", playerIdx: pIdx, question: pick(pool) });
+      });
+    } else if (gameMode === "minigames") {
+      for (let i = 0; i < players.length; i++) {
+        const mg = pick(minigames);
+        events.push({ type: "mg", mg, apIdx: mg.hasAssignedPlayer ? pick(players.map((_,j)=>j)) : null });
+      }
+    }
+    return events;
+  }, [players, cats, modes, neverContent, todContent, uncomfContent, minigames, gameMode]);
+
+  const computePhase = (e) => {
+    if (!e) return "content";
+    // truthOrDare and uncomf show roulette
+    if (e.type === "truthOrDare" || e.type === "uncomf") return "roulette";
+    // never always shows splash
+    if (e.type === "never") return "splash";
+    // minigames: if has assigned player, do roulette; otherwise splash
+    if (e.type === "mg") {
+      if (e.mg.hasAssignedPlayer && e.apIdx !== null) return "roulette";
+      return "splash";
+    }
+    return "content";
+  };
+
+  const startGame = () => {
+    if (players.length < 2) return;
+    const ev = genEvents();
+    if (ev.length === 0) return;
+    setEvents(ev);
+    setEIdx(0);
+    setRound(1);
+    setTodChoice(null);
+    setCoinResult(null);
+    setMedDone(false);
+    setBottleTarget(null);
+    setBottleAction(null);
+    setPhase(computePhase(ev[0]));
+    setScreen("game");
+  };
+
+  const next = () => {
+    setTodChoice(null);
+    setCoinResult(null);
+    setMedDone(false);
+    setBottleTarget(null);
+    setBottleAction(null);
+    let ni, nr = round, ne = events;
+    if (eIdx < events.length - 1) ni = eIdx + 1;
+    else { ne = genEvents(); setEvents(ne); ni = 0; nr = round + 1; setRound(nr); }
+    setEIdx(ni);
+    setPhase(computePhase(ne[ni]));
+  };
+
+  const getTod = (c, type) => {
+    const x = todContent[c] || todContent.casual;
+    const pool = x[type] || [];
+    return pool.length > 0 ? pick(pool) : "No hay contenido.";
+  };
+
+  // Get a compatible "Y" player for an action targeting X
+  // Tries to find someone X is attracted to. Falls back to any other player.
+  const getCompatibleY = (xIdx) => {
+    const x = players[xIdx];
+    if (!x) return null;
+    const others = players.filter((_, i) => i !== xIdx);
+    if (others.length === 0) return null;
+    // Filter by X's attraction preferences
+    const compatible = others.filter(p => x.attracted && x.attracted.includes(p.gender));
+    if (compatible.length > 0) return compatible[Math.floor(Math.random() * compatible.length)];
+    // Fallback: any other player (so the game doesn't break)
+    return others[Math.floor(Math.random() * others.length)];
+  };
+
+  const repl = (txt, pi) => {
+    let r = txt;
+    if (r.includes("{X}")) r = r.replace(/\{X\}/g, players[pi].name);
+    if (r.includes("{Y}")) {
+      const o = getCompatibleY(pi);
+      r = r.replace(/\{Y\}/g, o ? o.name : "alguien");
+    }
+    return r;
+  };
+
+  const startMedusa = () => {
+    setMedCD(true);
+    setMedN(3);
+    const iv = setInterval(() => {
+      setMedN(p => {
+        if (p <= 1) { clearInterval(iv); setMedCD(false); setMedDone(true); return 0; }
+        return p - 1;
+      });
+    }, 1000);
+  };
+
+  // =========================================================
+  // EDITOR HELPERS
+  // =========================================================
+  const getPool = () => {
+    if (eMode === "neverHaveI") return neverContent[eCat] || [];
+    if (eMode === "uncomfortableQuestions") return uncomfContent[eCat] || [];
+    if (eMode === "truthOrDare") return (todContent[eCat] || {})[eSub] || [];
+    return [];
+  };
+  const setPool = (np) => {
+    if (eMode === "neverHaveI") setNeverContent({ ...neverContent, [eCat]: np });
+    else if (eMode === "uncomfortableQuestions") setUncomfContent({ ...uncomfContent, [eCat]: np });
+    else if (eMode === "truthOrDare") setTodContent({ ...todContent, [eCat]: { ...todContent[eCat], [eSub]: np } });
+  };
+  const addItem = () => { if (!newTxt.trim()) return; setPool([...getPool(), newTxt.trim()]); setNewTxt(""); };
+  const rmItem = (i) => setPool(getPool().filter((_,j)=>j!==i));
+  const saveEdit = (i) => { const p = [...getPool()]; p[i] = editTxt; setPool(p); setEditIdx(null); setEditTxt(""); };
+
+  // Minigame editor
+  const openMgEditor = (mgId) => {
+    if (mgId === null) {
+      // create new
+      setMgEditId(null);
+      setMgName("");
+      setMgDesc("");
+      setMgHasP(true);
+      setMgChance(null);
+      setMgActions([]);
+      setMgNewAction("");
+      setMgCaraProb(50);
+    } else {
+      const mg = minigames.find(m => m.id === mgId);
+      if (!mg) return;
+      setMgEditId(mgId);
+      setMgName(mg.name);
+      setMgDesc(mg.description);
+      setMgHasP(mg.hasAssignedPlayer);
+      setMgChance(mg.chanceElement);
+      setMgActions(mg.actions ? [...mg.actions] : []);
+      setMgNewAction("");
+      setMgCaraProb(typeof mg.caraProbability === "number" ? Math.round(mg.caraProbability * 100) : 50);
+    }
+    setScreen("mgEditForm");
+  };
+
+  const saveMinigame = () => {
+    if (!mgName.trim()) return;
+    if (mgEditId === null) {
+      // creating new
+      const newMg = {
+        id: "mg_" + Date.now(),
+        name: mgName,
+        description: mgDesc,
+        hasAssignedPlayer: mgHasP,
+        chanceElement: mgChance,
+        type: "custom",
+      };
+      if (mgChance === "bottle") newMg.actions = mgActions;
+      if (mgChance === "coin") newMg.caraProbability = mgCaraProb / 100;
+      setMinigames([...minigames, newMg]);
+    } else {
+      // editing existing — preserve type field
+      const updated = minigames.map(m => {
+        if (m.id !== mgEditId) return m;
+        const next = {
+          ...m,
+          name: mgName,
+          description: mgDesc,
+          hasAssignedPlayer: mgHasP,
+          chanceElement: mgChance,
+        };
+        if (mgChance === "bottle" || m.type === "builtin_botella") next.actions = mgActions;
+        else delete next.actions;
+        if (mgChance === "coin" || m.type === "builtin_moneda") next.caraProbability = mgCaraProb / 100;
+        else delete next.caraProbability;
+        return next;
+      });
+      setMinigames(updated);
+    }
+    setScreen("mgEdit");
+  };
+
+  const rmMinigame = (id) => setMinigames(minigames.filter(m => m.id !== id));
+
+  // =========================================================
+  // SCREENS
+  // =========================================================
+  const renderHome = () => {
+    const modeButtons = [
+      { mode: "pikiupi", label: "PIKIUPI", primary: true },
+      { mode: "truthOrDare", label: "Verdad o Reto" },
+      { mode: "neverHaveI", label: "Yo Nunca" },
+      { mode: "uncomfortableQuestions", label: "Preguntas Incómodas" },
+      { mode: "minigames", label: "Minijuegos" },
+    ];
+    return (
+      <div style={S.app}>
+        {/* Theme toggle (absolute) */}
+        <div style={{ position: "absolute", top: "calc(env(safe-area-inset-top) + 56px)", right: 16, zIndex: 20 }}>
+          <button style={S.themeBtn} onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+            {theme === "light" ? Icons.moon : Icons.sun}
+          </button>
+        </div>
+
+        {/* Logo fixed at top */}
+        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px 10px" }}>
+          <Logo color={t.logoColor} size={280} />
+        </div>
+
+        {/* Scrollable modes in the middle */}
+        <div style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "20px 20px 10px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+          WebkitOverflowScrolling: "touch",
+        }}>
+          {modeButtons.map((m) => (
+            <button
+              key={m.mode}
+              style={{
+                ...(m.primary ? S.bP : { background: t.cardBg, color: t.text, border: `2px solid ${t.cardBorder}`, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }),
+                width: "100%",
+                borderRadius: 18,
+                border: m.primary ? "none" : `2px solid ${t.cardBorder}`,
+                padding: m.primary ? "22px 24px" : "18px 24px",
+                cursor: "pointer",
+                fontFamily: "'Nunito',sans-serif",
+                fontSize: m.primary ? 24 : 19,
+                fontWeight: 900,
+                letterSpacing: m.primary ? 1.5 : 0.5,
+                textTransform: "uppercase",
+                textAlign: "center",
+                transition: "transform .15s",
+                textShadow: m.primary
+                  ? "1px 1px 0 rgba(0,0,0,0.15)"
+                  : "1px 1px 0 rgba(0,0,0,0.05)",
+              }}
+              onClick={() => { setGameMode(m.mode); setScreen("setup"); }}
+            >
+              {m.label}
+            </button>
+          ))}
+          <div style={{ height: 10 }} />
+        </div>
+
+        {/* Personalizar + footer fixed at bottom */}
+        <div style={{ flexShrink: 0, padding: "12px 20px 16px", background: theme === "light" ? "linear-gradient(180deg, transparent 0%, rgba(255,195,0,0.6) 30%, #FFC300 100%)" : "linear-gradient(180deg, transparent 0%, rgba(15,15,35,0.6) 30%, #0f0f23 100%)", backdropFilter: "blur(4px)" }}>
+          <button style={{ ...S.btn, ...S.bOutline, width: "100%", padding: "14px 24px", fontSize: 15 }} onClick={() => setScreen("editor")}>
+            Personalizar contenido
+          </button>
+          <div style={{ textAlign: "center", color: t.textMuted, fontSize: 11, marginTop: 10, opacity: 0.6 }}>
+            © Todos los cubatas reservados
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSetup = () => {
+    const modeName = {
+      pikiupi: "PIKIUPI",
+      truthOrDare: "Verdad o Reto",
+      neverHaveI: "Yo Nunca",
+      uncomfortableQuestions: "Preguntas Incómodas",
+      minigames: "Minijuegos",
+    }[gameMode];
+    return (
+      <div style={S.app}>
+        <div style={{ ...S.hdr, flexShrink: 0 }}>
+          <button style={S.bk} onClick={() => setScreen("home")}>{Icons.back}</button>
+          <span style={{ fontWeight: 800, fontSize: 18, color: t.accent }}>{modeName}</span>
+          <div style={{ width: 40 }} />
+        </div>
+
+        {/* Scrollable middle */}
+        <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", paddingBottom: 20 }}>
+          <div style={S.sec}>
+            <div style={S.lab}>Jugadores ({players.length}/16)</div>
+
+            {/* Name input — always shown when not editing a player */}
+            {editingPlayerIdx === null && (
+              <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                <input
+                  style={{ ...S.inp, flex: 1 }}
+                  placeholder="Nombre del jugador..."
+                  value={pInput}
+                  onChange={e => setPInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" && pInput.trim() && players.length < 16) {
+                      setPlayers([...players, { name: pInput.trim(), gender: "NB", attracted: ["M","F","NB"] }]);
+                      setPInput("");
+                    }
+                  }}
+                  maxLength={20}
+                />
+                <button style={{ ...S.btn, ...S.bP, padding: "12px 16px" }} onClick={() => {
+                  if (pInput.trim() && players.length < 16) {
+                    setPlayers([...players, { name: pInput.trim(), gender: "NB", attracted: ["M","F","NB"] }]);
+                    setPInput("");
+                  }
+                }}>
+                  {Icons.plus}
+                </button>
+              </div>
+            )}
+
+            {/* Edit gender/preferences modal */}
+            {editingPlayerIdx !== null && players[editingPlayerIdx] && (
+              <div style={{
+                ...S.card,
+                marginBottom: 12,
+                border: `2px solid ${t.accent}`,
+                animation: "fadeInUp .3s",
+              }}>
+                <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 4 }}>Editando gustos de:</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: t.accent, marginBottom: 16 }}>{players[editingPlayerIdx].name}</div>
+
+                <div style={{ marginBottom: 16 }}>
+                  <div style={S.lab}>¿Es?</div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {[{k:"M",l:"Hombre"},{k:"F",l:"Mujer"},{k:"NB",l:"No binarie"}].map(g => (
+                      <button key={g.k} style={S.chip(editGender === g.k)} onClick={() => setEditGender(g.k)}>{g.l}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: 16 }}>
+                  <div style={S.lab}>Le interesa</div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {[{k:"M",l:"Hombres"},{k:"F",l:"Mujeres"},{k:"NB",l:"No binaries"}].map(g => (
+                      <button key={g.k} style={S.chip(editAttracted.includes(g.k))} onClick={() => {
+                        if (editAttracted.includes(g.k)) setEditAttracted(editAttracted.filter(x => x !== g.k));
+                        else setEditAttracted([...editAttracted, g.k]);
+                      }}>{g.l}</button>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 11, color: t.textMuted, marginTop: 6, opacity: 0.8 }}>Puedes seleccionar varios</p>
+                </div>
+
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    style={{ ...S.btn, ...S.bOutline, flex: 1, padding: "12px 16px", fontSize: 14 }}
+                    onClick={() => { setEditingPlayerIdx(null); }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    style={{
+                      ...S.btn, ...S.bP,
+                      flex: 1, padding: "12px 16px", fontSize: 14,
+                      opacity: (editGender && editAttracted.length > 0) ? 1 : 0.4,
+                    }}
+                    disabled={!editGender || editAttracted.length === 0}
+                    onClick={() => {
+                      const updated = [...players];
+                      updated[editingPlayerIdx] = { ...updated[editingPlayerIdx], gender: editGender, attracted: editAttracted };
+                      setPlayers(updated);
+                      setEditingPlayerIdx(null);
+                    }}
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Player tags with edit button */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {players.map((p, i) => {
+                // Check if player has been personalized (not default)
+                const isDefault = p.gender === "NB" && p.attracted && p.attracted.length === 3;
+                return (
+                  <div key={i} style={{ ...S.tag, paddingRight: 4 }}>
+                    {p.name}
+                    <button
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#FFD700",
+                        cursor: "pointer",
+                        padding: "0 4px",
+                        marginLeft: 6,
+                        opacity: isDefault ? 0.55 : 1,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      onClick={() => {
+                        setEditingPlayerIdx(i);
+                        setEditGender(p.gender);
+                        setEditAttracted([...(p.attracted || [])]);
+                      }}
+                      title="Editar gustos"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                    <button style={S.tagX} onClick={() => setPlayers(players.filter((_,j)=>j!==i))}>×</button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {gameMode !== "minigames" && (
+            <div style={S.sec}>
+              <div style={S.lab}>Categorías</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {[{k:"casual",l:"Casual"},{k:"picante",l:"Picante"},{k:"extremo",l:"Extremo"}].map(c => (
+                  <button key={c.k} style={S.chip(cats.includes(c.k))} onClick={() => {
+                    if (cats.includes(c.k)) { if (cats.length > 1) setCats(cats.filter(x => x !== c.k)); }
+                    else setCats([...cats, c.k]);
+                  }}>{c.l}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {gameMode === "pikiupi" && (
+            <div style={S.sec}>
+              <div style={S.lab}>Modos a mezclar</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {[{k:"truthOrDare",l:"Verdad o Reto"},{k:"neverHaveI",l:"Yo Nunca"},{k:"uncomfortableQuestions",l:"Preguntas Incómodas"},{k:"minigames",l:"Minijuegos"}].map(m => (
+                  <button key={m.k} style={{ ...S.chip(modes.includes(m.k)), display: "flex", alignItems: "center", gap: 8, textAlign: "left" }} onClick={() => {
+                    if (modes.includes(m.k)) { if (modes.length > 1) setModes(modes.filter(x => x !== m.k)); }
+                    else setModes([...modes, m.k]);
+                  }}>
+                    {modes.includes(m.k) ? Icons.check : <span style={{ width: 20 }} />} {m.l}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sticky bottom button */}
+        <div style={{ flexShrink: 0, padding: "12px 20px 16px", background: theme === "light" ? "linear-gradient(180deg, transparent 0%, rgba(255,195,0,0.6) 30%, #FFC300 100%)" : "linear-gradient(180deg, transparent 0%, rgba(15,15,35,0.6) 30%, #0f0f23 100%)", backdropFilter: "blur(4px)" }}>
+          <button style={{ ...S.btn, ...S.bP, width: "100%", opacity: players.length >= 2 ? 1 : .4, fontSize: 19, padding: 18 }} onClick={startGame} disabled={players.length < 2}>
+            EMPEZAR
+          </button>
+          {players.length < 2 && <p style={{ textAlign: "center", color: t.textMuted, fontSize: 13, marginTop: 8 }}>Añade al menos 2 jugadores</p>}
+        </div>
+      </div>
+    );
+  };
+
+  const renderGame = () => {
+    if (!events.length) return null;
+    const ev = events[eIdx];
+
+    if (phase === "roulette") {
+      const tgt = ev.type === "mg" ? ev.apIdx : ev.playerIdx;
+      return (
+        <div style={S.app}>
+          <div style={S.hdr}>
+            <button style={S.bk} onClick={() => setScreen("home")}>{Icons.close}</button>
+            <span style={{ fontWeight: 800, fontSize: 14, color: t.textMuted }}>Ronda {round}</span>
+            <div style={{ width: 40 }} />
+          </div>
+          <RouletteAnim players={players} targetIdx={tgt} onDone={() => setPhase("content")} t={t} />
+        </div>
+      );
+    }
+
+    if (phase === "splash") {
+      let title = "";
+      if (ev.type === "never") title = "YO NUNCA";
+      else if (ev.type === "mg") title = ev.mg.name;
+      return (
+        <div style={S.app}>
+          <div style={S.hdr}>
+            <button style={S.bk} onClick={() => setScreen("home")}>{Icons.close}</button>
+            <span style={{ fontWeight: 800, fontSize: 14, color: t.textMuted }}>Ronda {round}</span>
+            <div style={{ width: 40 }} />
+          </div>
+          <GroupSplash title={title} onTap={() => setPhase("content")} t={t} />
+        </div>
+      );
+    }
+
+    const renderContent = () => {
+      if (ev.type === "truthOrDare") {
+        const p = players[ev.playerIdx].name;
+        if (!todChoice) {
+          return (
+            <div style={S.gc}>
+              <p style={{ fontSize: 14, color: t.textMuted, marginBottom: 8 }}>Turno de</p>
+              <h1 style={{ fontSize: 50, fontWeight: 900, color: t.rouletteColor, marginBottom: 32, textShadow: t.rouletteColor === "#FFD700" ? `0 0 40px rgba(255,215,0,0.6)` : "0 2px 20px rgba(74,15,160,0.4)" }}>{p}</h1>
+              <p style={{ fontSize: 20, color: t.text, marginBottom: 40, fontWeight: 700 }}>¿Verdad o Reto?</p>
+              <div style={{ display: "flex", gap: 16, width: "100%" }}>
+                <button style={{
+                  ...S.btn,
+                  flex: 1,
+                  fontSize: 19,
+                  background: "linear-gradient(135deg,#6B1FE8,#5A18C9)",
+                  color: "#FFD700",
+                  boxShadow: "0 4px 20px rgba(107,31,232,.4)",
+                  border: `3px solid ${theme === "light" ? "#4A0FA0" : "#FFD700"}`,
+                }} onClick={() => setTodChoice("verdad")}>Verdad</button>
+                <button style={{
+                  ...S.btn,
+                  flex: 1,
+                  fontSize: 19,
+                  background: "linear-gradient(135deg,#FFD700,#FFC300)",
+                  color: "#1a1a2e",
+                  boxShadow: "0 4px 20px rgba(255,215,0,.4)",
+                  border: `3px solid ${theme === "light" ? "#6B1FE8" : "#FFD700"}`,
+                }} onClick={() => setTodChoice("reto")}>Reto</button>
+              </div>
+            </div>
+          );
+        }
+        const content = getTod(ev.category, todChoice);
+        const final = repl(content, ev.playerIdx);
+        return (
+          <div style={S.gc}>
+            {/* Modo arriba grande */}
+            <h1 style={{
+              fontSize: 38,
+              fontWeight: 900,
+              color: todChoice === "verdad" ? t.accent : (theme === "light" ? "#8B6F00" : t.yellow),
+              textTransform: "uppercase",
+              letterSpacing: 2,
+              marginBottom: 4,
+              textShadow: todChoice === "verdad"
+                ? (theme === "light" ? "0 2px 10px rgba(107,31,232,0.2)" : "0 0 30px rgba(107,31,232,0.6)")
+                : "0 2px 10px rgba(255,215,0,0.3)",
+            }}>{todChoice === "verdad" ? "VERDAD" : "RETO"}</h1>
+            {/* Nombre del jugador grande */}
+            <h2 style={{
+              fontSize: 42,
+              fontWeight: 900,
+              color: t.rouletteColor,
+              marginBottom: 32,
+              textShadow: t.rouletteColor === "#FFD700"
+                ? "0 0 40px rgba(255,215,0,0.6)"
+                : "0 2px 20px rgba(74,15,160,0.4)",
+            }}>{p}</h2>
+            {/* Contenido del reto/verdad */}
+            <p style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.4, color: t.text, maxWidth: 360 }}>{final}</p>
+          </div>
+        );
+      }
+
+      if (ev.type === "never") {
+        return (
+          <div style={S.gc}>
+            {/* YO NUNCA destacado con animación */}
+            <h1 style={{
+              fontSize: 38,
+              fontWeight: 900,
+              color: t.accent,
+              textTransform: "uppercase",
+              letterSpacing: 2,
+              marginBottom: 28,
+              textShadow: theme === "light" ? "0 2px 10px rgba(107,31,232,0.2)" : "0 0 30px rgba(107,31,232,0.5)",
+              animation: "titlePulse 2.5s ease-in-out infinite",
+              transformOrigin: "center",
+            }}>Yo Nunca</h1>
+            {/* La frase del Yo Nunca */}
+            <p style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.4, color: t.text, maxWidth: 360 }}>{ev.text}</p>
+            <p style={{ color: t.textMuted, fontSize: 14, marginTop: 18 }}>Si lo has hecho... bebe.</p>
+          </div>
+        );
+      }
+
+      if (ev.type === "uncomf") {
+        const p = players[ev.playerIdx].name;
+        return (
+          <div style={S.gc}>
+            {/* Modo arriba grande */}
+            <h1 style={{
+              fontSize: 30,
+              fontWeight: 900,
+              color: theme === "light" ? "#C46300" : "#FF9800",
+              textTransform: "uppercase",
+              letterSpacing: 1.5,
+              marginBottom: 4,
+              textShadow: "0 2px 10px rgba(255,152,0,0.25)",
+              textAlign: "center",
+              padding: "0 16px",
+            }}>PREGUNTA INCÓMODA</h1>
+            {/* Nombre del jugador grande */}
+            <h2 style={{
+              fontSize: 42,
+              fontWeight: 900,
+              color: t.rouletteColor,
+              marginBottom: 32,
+              textShadow: t.rouletteColor === "#FFD700"
+                ? "0 0 40px rgba(255,215,0,0.6)"
+                : "0 2px 20px rgba(74,15,160,0.4)",
+            }}>{p}</h2>
+            {/* La pregunta */}
+            <p style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.4, color: t.text, maxWidth: 360 }}>{ev.question}</p>
+            <p style={{ color: t.textMuted, fontSize: 14, marginTop: 18 }}>Si no contestas... bebe el doble.</p>
+          </div>
+        );
+      }
+
+      if (ev.type === "mg") {
+        const mg = ev.mg;
+        if (mg.type === "builtin_medusa") {
+          return (
+            <div style={S.gc}>
+              {/* MEDUSA con animación */}
+              <h1 style={{
+                fontSize: 44,
+                fontWeight: 900,
+                color: t.accent,
+                textTransform: "uppercase",
+                letterSpacing: 2,
+                marginBottom: 20,
+                animation: "titlePulse 1.8s ease-in-out infinite",
+                transformOrigin: "center",
+                textShadow: theme === "light" ? "0 2px 15px rgba(107,31,232,0.25)" : "0 0 40px rgba(107,31,232,0.6)",
+              }}>{mg.name}</h1>
+              <p style={{ color: t.textMuted, fontSize: 16, marginBottom: 32, maxWidth: 340, lineHeight: 1.5 }}>{mg.description}</p>
+              {!medCD && !medDone && <button style={{ ...S.btn, ...S.bP, fontSize: 19 }} onClick={startMedusa}>EMPEZAR</button>}
+              {medCD && <div style={{ fontSize: 120, fontWeight: 900, color: t.rouletteColor, animation: "pulse .5s", textShadow: t.rouletteColor === "#FFD700" ? "0 0 40px rgba(255,215,0,0.6)" : "0 4px 20px rgba(74,15,160,0.4)" }}>{medN}</div>}
+              {medDone && <div style={{ padding: "20px 40px", borderRadius: 20, background: "linear-gradient(135deg,#FFD700,#FFC300)", color: "#1a1a2e", fontSize: 28, fontWeight: 900, animation: "bounceIn .5s" }}>¡¡ARRIBA!!</div>}
+            </div>
+          );
+        }
+        if (mg.type === "builtin_moneda") {
+          const ap = ev.apIdx !== null ? players[ev.apIdx].name : null;
+          return (
+            <div style={S.gc}>
+              <h1 style={{
+                fontSize: 36,
+                fontWeight: 900,
+                color: t.accent,
+                marginBottom: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1.5,
+                animation: "titlePulse 2.5s ease-in-out infinite",
+                transformOrigin: "center",
+                textShadow: theme === "light" ? "0 2px 10px rgba(107,31,232,0.2)" : "0 0 30px rgba(107,31,232,0.5)",
+              }}>{mg.name}</h1>
+              {ap && <div style={{ padding: "8px 24px", borderRadius: 25, background: t.accentSoft, color: t.accent, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{ap}, tú preguntas</div>}
+              <p style={{ color: t.textMuted, fontSize: 14, marginBottom: 32, maxWidth: 340, lineHeight: 1.5 }}>{mg.description}</p>
+              <CoinFlip onResult={c => setCoinResult(c)} t={t} caraProbability={typeof mg.caraProbability === "number" ? mg.caraProbability : 0.55} />
+            </div>
+          );
+        }
+        if (mg.type === "builtin_botella") {
+          const apIdx = ev.apIdx;
+          const ap = apIdx !== null ? players[apIdx].name : null;
+          const actions = mg.actions || [];
+          return (
+            <div style={S.gc}>
+              <h1 style={{
+                fontSize: 36,
+                fontWeight: 900,
+                color: t.accent,
+                marginBottom: 8,
+                textTransform: "uppercase",
+                letterSpacing: 1.5,
+                animation: "titlePulse 2.5s ease-in-out infinite",
+                transformOrigin: "center",
+                textShadow: theme === "light" ? "0 2px 10px rgba(107,31,232,0.2)" : "0 0 30px rgba(107,31,232,0.5)",
+              }}>{mg.name}</h1>
+              {ap && <div style={{ padding: "8px 24px", borderRadius: 25, background: t.accentSoft, color: t.accent, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{ap}, gira la botella</div>}
+              <p style={{ color: t.textMuted, fontSize: 14, marginBottom: 24, maxWidth: 340, lineHeight: 1.5 }}>{mg.description}</p>
+              <BottleSpin
+                players={players}
+                currentPlayerIdx={apIdx !== null ? apIdx : 0}
+                compatibleIdxs={apIdx !== null && players[apIdx] && players[apIdx].attracted ? players.map((p, i) => (i !== apIdx && players[apIdx].attracted.includes(p.gender)) ? i : -1).filter(i => i !== -1) : null}
+                onResult={(tIdx) => {
+                  setBottleTarget(tIdx);
+                  if (actions.length > 0) setBottleAction(pick(actions));
+                }}
+                t={t}
+              />
+              {bottleAction && bottleTarget !== null && (
+                <div style={{ marginTop: 20, padding: "16px 24px", borderRadius: 16, background: "linear-gradient(135deg,#6B1FE8,#5A18C9)", color: "#FFD700", fontSize: 17, fontWeight: 800, textAlign: "center", maxWidth: 340, animation: "fadeInUp .5s" }}>
+                  {ap} tiene que <span style={{ color: "#fff", textTransform: "uppercase" }}>{bottleAction}</span> a {players[bottleTarget].name}
+                </div>
+              )}
+            </div>
+          );
+        }
+        // Custom minigame
+        const isGroup = !mg.hasAssignedPlayer;
+        return (
+          <div style={S.gc}>
+            <h1 style={{
+              fontSize: isGroup ? 42 : 36,
+              fontWeight: 900,
+              color: t.accent,
+              marginBottom: 8,
+              textTransform: "uppercase",
+              letterSpacing: 1.5,
+              animation: "titlePulse 2.5s ease-in-out infinite",
+              transformOrigin: "center",
+              textShadow: theme === "light" ? "0 2px 10px rgba(107,31,232,0.2)" : "0 0 30px rgba(107,31,232,0.5)",
+            }}>{mg.name}</h1>
+            {ev.apIdx !== null && <div style={{ padding: "8px 24px", borderRadius: 25, background: t.accentSoft, color: t.accent, fontSize: 15, fontWeight: 700, marginBottom: 16, marginTop: 8 }}>{players[ev.apIdx].name}, te toca</div>}
+            <p style={{ color: t.text, fontSize: 16, maxWidth: 340, lineHeight: 1.5, marginTop: 8 }}>{mg.description}</p>
+            {mg.chanceElement === "coin" && <div style={{ marginTop: 24 }}><CoinFlip onResult={() => {}} t={t} caraProbability={typeof mg.caraProbability === "number" ? mg.caraProbability : 0.5} /></div>}
+            {mg.chanceElement === "bottle" && (
+              <div style={{ marginTop: 24, width: "100%" }}>
+                <BottleSpin
+                  players={players}
+                  currentPlayerIdx={ev.apIdx !== null ? ev.apIdx : 0}
+                  compatibleIdxs={ev.apIdx !== null && players[ev.apIdx] && players[ev.apIdx].attracted ? players.map((p, i) => (i !== ev.apIdx && players[ev.apIdx].attracted.includes(p.gender)) ? i : -1).filter(i => i !== -1) : null}
+                  onResult={(tIdx) => {
+                    setBottleTarget(tIdx);
+                    if (mg.actions && mg.actions.length > 0) setBottleAction(pick(mg.actions));
+                  }}
+                  t={t}
+                />
+                {bottleAction && bottleTarget !== null && (
+                  <div style={{ marginTop: 20, padding: "16px 24px", borderRadius: 16, background: "linear-gradient(135deg,#6B1FE8,#5A18C9)", color: "#FFD700", fontSize: 17, fontWeight: 800, textAlign: "center", animation: "fadeInUp .5s" }}>
+                    {players[ev.apIdx].name} tiene que <span style={{ color: "#fff", textTransform: "uppercase" }}>{bottleAction}</span> a {players[bottleTarget].name}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      }
+      return null;
+    };
+
+    return (
+      <div style={S.app}>
+        <div style={S.hdr}>
+          <button style={S.bk} onClick={() => setScreen("home")}>{Icons.close}</button>
+          <span style={{ fontWeight: 800, fontSize: 14, color: t.textMuted }}>Ronda {round} — {eIdx+1}/{events.length}</span>
+          <div style={{ width: 40 }} />
+        </div>
+        <div style={{ flex: 1, position: "relative" }}>
+          {renderContent()}
+        </div>
+        <div style={{ padding: "0 20px 40px" }}>
+          <button style={{ ...S.btn, ...S.bP, width: "100%", fontSize: 17 }} onClick={next}>SIGUIENTE</button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderEditor = () => (
+    <div style={S.app}>
+      <div style={S.hdr}>
+        <button style={S.bk} onClick={() => setScreen("home")}>{Icons.back}</button>
+        <span style={{ fontWeight: 800, fontSize: 18, color: t.accent }}>PERSONALIZAR</span>
+        <div style={{ width: 40 }} />
+      </div>
+      <div style={{ padding: "0 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+        {[
+          { k: "neverHaveI", l: "Yo Nunca", d: "Editar frases" },
+          { k: "truthOrDare", l: "Verdad o Reto", d: "Editar verdades y retos" },
+          { k: "uncomfortableQuestions", l: "Preguntas Incómodas", d: "Editar preguntas" },
+          { k: "minigameEditor", l: "Minijuegos", d: "Editar minijuegos existentes y crear nuevos" },
+        ].map(x => (
+          <button key={x.k} style={{ ...S.card, width: "100%", textAlign: "left", cursor: "pointer", border: `1px solid ${t.cardBorder}` }} onClick={() => {
+            if (x.k === "minigameEditor") setScreen("mgEdit");
+            else { setEMode(x.k); setECat("casual"); setESub("verdad"); setScreen("editC"); }
+          }}>
+            <div style={{ fontWeight: 800, color: t.accent, fontSize: 17, marginBottom: 4 }}>{x.l}</div>
+            <div style={{ fontSize: 13, color: t.textMuted }}>{x.d}</div>
+          </button>
+        ))}
+      </div>
+      <div style={{ padding: "30px 20px 20px" }}>
+        <button
+          style={{ ...S.btn, ...S.bOutline, width: "100%", padding: "12px 20px", fontSize: 14 }}
+          onClick={() => {
+            if (window.confirm("¿Seguro que quieres resetear todo el contenido a los valores por defecto? Perderás todos los cambios que hayas hecho.")) {
+              setNeverContent(JSON.parse(JSON.stringify(DEFAULT_NEVER)));
+              setTodContent(JSON.parse(JSON.stringify(DEFAULT_TOD)));
+              setUncomfContent(JSON.parse(JSON.stringify(DEFAULT_UNCOMF)));
+              setMinigames(JSON.parse(JSON.stringify(DEFAULT_MG)));
+            }
+          }}
+        >
+          Resetear todo a valores por defecto
+        </button>
+        <p style={{ fontSize: 11, color: t.textMuted, textAlign: "center", marginTop: 10, opacity: 0.7 }}>
+          Tu contenido se guarda automáticamente y se mantiene aunque cierres la app
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderEditContent = () => {
+    const pool = getPool();
+    const labs = { neverHaveI: "Yo Nunca", truthOrDare: "Verdad o Reto", uncomfortableQuestions: "Preguntas Incómodas" };
+    const isRetoMode = eMode === "truthOrDare" && eSub === "reto";
+
+    const insertPlaceholder = (placeholder, isEditMode) => {
+      if (isEditMode) {
+        setEditTxt(editTxt + (editTxt && !editTxt.endsWith(" ") ? " " : "") + placeholder);
+      } else {
+        setNewTxt(newTxt + (newTxt && !newTxt.endsWith(" ") ? " " : "") + placeholder);
+      }
+    };
+
+    // Stylized "person" button to insert {X} or {Y}
+    const PersonBtn = ({ which, isEditMode }) => {
+      const isX = which === "X";
+      return (
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => insertPlaceholder(`{${which}}`, isEditMode)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 12px",
+            borderRadius: 12,
+            border: `2px solid ${isX ? "#FFD700" : t.accent}`,
+            background: isX ? "rgba(255,215,0,0.15)" : t.accentSoft,
+            color: isX ? (theme === "light" ? "#8B6F00" : t.yellow) : t.accent,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 800,
+            fontFamily: "'Nunito',sans-serif",
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M12 14c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" />
+          </svg>
+          <span>{isX ? "Jugador actual" : "Otro jugador"}</span>
+        </button>
+      );
+    };
+
+    return (
+      <div style={S.app}>
+        <div style={{ ...S.hdr, flexShrink: 0 }}>
+          <button style={S.bk} onClick={() => setScreen("editor")}>{Icons.back}</button>
+          <span style={{ fontWeight: 800, fontSize: 17, color: t.accent }}>{labs[eMode]}</span>
+          <div style={{ width: 40 }} />
+        </div>
+        <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", paddingBottom: 16 }}>
+          <div style={S.sec}>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["casual","picante","extremo"].map(c => (
+                <button key={c} style={S.chip(eCat === c)} onClick={() => setECat(c)}>{c.charAt(0).toUpperCase() + c.slice(1)}</button>
+              ))}
+            </div>
+          </div>
+          {eMode === "truthOrDare" && (
+            <div style={S.sec}>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button style={S.chip(eSub === "verdad")} onClick={() => setESub("verdad")}>Verdad</button>
+                <button style={S.chip(eSub === "reto")} onClick={() => setESub("reto")}>Reto</button>
+              </div>
+            </div>
+          )}
+          <div style={S.sec}>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input style={{ ...S.inp, flex: 1 }} placeholder={isRetoMode ? "Escribe el reto..." : "Añadir nuevo..."} value={newTxt} onChange={e => setNewTxt(e.target.value)} onKeyDown={e => e.key === "Enter" && addItem()} />
+              <button style={{ ...S.btn, ...S.bP, padding: "12px 16px" }} onClick={addItem}>{Icons.plus}</button>
+            </div>
+            {isRetoMode && (
+              <div style={{ marginTop: 10 }}>
+                <p style={{ fontSize: 11, color: t.textMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 700 }}>Toca para insertar:</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <PersonBtn which="X" isEditMode={false} />
+                  <PersonBtn which="Y" isEditMode={false} />
+                </div>
+                <p style={{ fontSize: 11, color: t.textMuted, marginTop: 8, opacity: 0.8 }}>El "jugador actual" es a quien le toca el turno. "Otro jugador" es uno aleatorio del grupo.</p>
+              </div>
+            )}
+          </div>
+          <div style={S.sec}>
+            {pool.map((item, idx) => (
+              <div key={idx} style={{ padding: "12px 16px", borderRadius: 12, background: t.cardBg, marginBottom: 8, border: `1px solid ${t.cardBorder}` }}>
+                {editIdx === idx ? (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <input style={{ ...S.inp, flex: 1, fontSize: 14, padding: "8px 12px" }} value={editTxt} onChange={e => setEditTxt(e.target.value)} onKeyDown={e => e.key === "Enter" && saveEdit(idx)} autoFocus />
+                      <button style={S.ib} onClick={() => saveEdit(idx)}>{Icons.check}</button>
+                      <button style={S.ib} onClick={() => setEditIdx(null)}>{Icons.close}</button>
+                    </div>
+                    {isRetoMode && (
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+                        <PersonBtn which="X" isEditMode={true} />
+                        <PersonBtn which="Y" isEditMode={true} />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ flex: 1, fontSize: 14, color: t.text }}>{item}</span>
+                    <button style={S.ib} onClick={() => { setEditIdx(idx); setEditTxt(item); }}>{Icons.edit}</button>
+                    <button style={{ ...S.ib, color: "#f44336" }} onClick={() => rmItem(idx)}>{Icons.trash}</button>
+                  </div>
+                )}
+              </div>
+            ))}
+            {pool.length === 0 && <p style={{ textAlign: "center", color: t.textMuted, padding: 20 }}>No hay contenido aún</p>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // List of minigames (with edit/delete)
+  const renderMgList = () => (
+    <div style={S.app}>
+      <div style={S.hdr}>
+        <button style={S.bk} onClick={() => setScreen("editor")}>{Icons.back}</button>
+        <span style={{ fontWeight: 800, fontSize: 17, color: t.accent }}>Minijuegos</span>
+        <div style={{ width: 40 }} />
+      </div>
+      <div style={S.sec}>
+        {minigames.map((mg) => (
+          <div key={mg.id} style={{ ...S.card, marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, color: t.accent, fontSize: 16 }}>{mg.name}</div>
+                <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>{mg.description}</div>
+                <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
+                  {mg.hasAssignedPlayer && <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 10, background: "rgba(255,215,0,.25)", color: theme === "light" ? "#8B6F00" : t.yellow }}>Jugador asignado</span>}
+                  {mg.chanceElement === "coin" && <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 10, background: t.accentSoft, color: t.accent }}>Moneda</span>}
+                  {mg.chanceElement === "bottle" && <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 10, background: t.accentSoft, color: t.accent }}>Botella</span>}
+                  {mg.chanceElement === "dice" && <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 10, background: t.accentSoft, color: t.accent }}>Dado</span>}
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <button style={S.ib} onClick={() => openMgEditor(mg.id)}>{Icons.edit}</button>
+                <button style={{ ...S.ib, color: "#f44336" }} onClick={() => rmMinigame(mg.id)}>{Icons.trash}</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={S.sec}>
+        <button style={{ ...S.btn, ...S.bP, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }} onClick={() => openMgEditor(null)}>
+          {Icons.plus} CREAR MINIJUEGO
+        </button>
+      </div>
+    </div>
+  );
+
+  // Form to create/edit a minigame
+  const renderMgForm = () => {
+    const isEditing = mgEditId !== null;
+    const editingMg = isEditing ? minigames.find(m => m.id === mgEditId) : null;
+    const isBuiltin = editingMg && editingMg.type && editingMg.type.startsWith("builtin_");
+    const showActions = mgChance === "bottle" || (editingMg && editingMg.type === "builtin_botella");
+    const showCoinProb = mgChance === "coin" || (editingMg && editingMg.type === "builtin_moneda");
+
+    return (
+      <div style={S.app}>
+        <div style={S.hdr}>
+          <button style={S.bk} onClick={() => setScreen("mgEdit")}>{Icons.back}</button>
+          <span style={{ fontWeight: 800, fontSize: 17, color: t.accent }}>{isEditing ? "Editar minijuego" : "Crear minijuego"}</span>
+          <div style={{ width: 40 }} />
+        </div>
+        <div style={S.sec}>
+          <div style={S.card}>
+            <div style={S.lab}>Nombre</div>
+            <input style={{ ...S.inp, marginBottom: 14 }} placeholder="Nombre del minijuego" value={mgName} onChange={e => setMgName(e.target.value)} />
+
+            <div style={S.lab}>Descripción</div>
+            <textarea style={{ ...S.inp, minHeight: 80, resize: "vertical", marginBottom: 14 }} placeholder="Descripción / reglas..." value={mgDesc} onChange={e => setMgDesc(e.target.value)} />
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={S.lab}>¿Tiene jugador asignado?</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button style={S.chip(mgHasP)} onClick={() => setMgHasP(true)}>Sí</button>
+                <button style={S.chip(!mgHasP)} onClick={() => setMgHasP(false)}>No</button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={S.lab}>Elemento de azar</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button style={S.chip(mgChance === null)} onClick={() => setMgChance(null)}>Ninguno</button>
+                <button style={S.chip(mgChance === "coin")} onClick={() => setMgChance("coin")}>Moneda</button>
+                <button style={S.chip(mgChance === "bottle")} onClick={() => setMgChance("bottle")}>Botella</button>
+                <button style={S.chip(mgChance === "dice")} onClick={() => setMgChance("dice")}>Dado</button>
+              </div>
+              {isBuiltin && <p style={{ fontSize: 11, color: t.textMuted, marginTop: 6 }}>Es un minijuego predefinido. Cambiar el tipo de azar puede afectar su funcionamiento.</p>}
+            </div>
+
+            {showCoinProb && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={S.lab}>Probabilidad de Cara</div>
+                <p style={{ fontSize: 12, color: t.textMuted, marginBottom: 12 }}>Ajusta cuánto sale cada cara. ¡Sé travieso! 😈</p>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}>
+                  <div style={{
+                    padding: "6px 14px",
+                    borderRadius: 12,
+                    background: "linear-gradient(135deg,#FFD700,#FFC300)",
+                    color: "#1a1a2e",
+                    fontSize: 13,
+                    fontWeight: 900,
+                    minWidth: 70,
+                    textAlign: "center",
+                  }}>CARA {mgCaraProb}%</div>
+                  <div style={{
+                    padding: "6px 14px",
+                    borderRadius: 12,
+                    background: "linear-gradient(135deg,#6B1FE8,#4A0FA0)",
+                    color: "#FFD700",
+                    fontSize: 13,
+                    fontWeight: 900,
+                    minWidth: 70,
+                    textAlign: "center",
+                  }}>CRUZ {100 - mgCaraProb}%</div>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={mgCaraProb}
+                  onChange={e => setMgCaraProb(parseInt(e.target.value, 10))}
+                  style={{
+                    width: "100%",
+                    height: 8,
+                    accentColor: t.accent,
+                    cursor: "pointer",
+                  }}
+                />
+                <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
+                  {[0, 25, 50, 75, 100].map(p => (
+                    <button
+                      key={p}
+                      style={{ ...S.chip(mgCaraProb === p), fontSize: 12, padding: "6px 12px" }}
+                      onClick={() => setMgCaraProb(p)}
+                    >
+                      {p}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {showActions && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={S.lab}>Acciones (si la botella apunta a alguien)</div>
+                <p style={{ fontSize: 12, color: t.textMuted, marginBottom: 10 }}>Cuando la botella apunte a un jugador, se elegirá una de estas acciones al azar.</p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                  <input
+                    style={{ ...S.inp, flex: 1 }}
+                    placeholder="Ej: darle un beso"
+                    value={mgNewAction}
+                    onChange={e => setMgNewAction(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && mgNewAction.trim()) {
+                        setMgActions([...mgActions, mgNewAction.trim()]);
+                        setMgNewAction("");
+                      }
+                    }}
+                  />
+                  <button style={{ ...S.btn, ...S.bP, padding: "12px 16px" }} onClick={() => {
+                    if (mgNewAction.trim()) { setMgActions([...mgActions, mgNewAction.trim()]); setMgNewAction(""); }
+                  }}>{Icons.plus}</button>
+                </div>
+                <div>
+                  {mgActions.map((a, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, background: t.cardBg, marginBottom: 6, border: `1px solid ${t.cardBorder}` }}>
+                      <span style={{ flex: 1, fontSize: 13, color: t.text }}>{a}</span>
+                      <button style={{ ...S.ib, color: "#f44336" }} onClick={() => setMgActions(mgActions.filter((_,j)=>j!==i))}>{Icons.trash}</button>
+                    </div>
+                  ))}
+                  {mgActions.length === 0 && <p style={{ fontSize: 12, color: t.textMuted, textAlign: "center", padding: 10 }}>Añade al menos una acción</p>}
+                </div>
+              </div>
+            )}
+
+            <button style={{ ...S.btn, ...S.bP, width: "100%", opacity: mgName.trim() ? 1 : .4 }} onClick={saveMinigame} disabled={!mgName.trim()}>
+              {isEditing ? "GUARDAR CAMBIOS" : "CREAR MINIJUEGO"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {screen === "home" && renderHome()}
+      {screen === "setup" && renderSetup()}
+      {screen === "game" && renderGame()}
+      {screen === "editor" && renderEditor()}
+      {screen === "editC" && renderEditContent()}
+      {screen === "mgEdit" && renderMgList()}
+      {screen === "mgEditForm" && renderMgForm()}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Pikiupi />);
+</script>
+</body>
+</html>
